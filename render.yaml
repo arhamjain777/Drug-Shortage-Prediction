@@ -1,0 +1,23 @@
+# Render Blueprint (UNVERIFIED: never deployed from this sandbox). One web service + one Postgres database.
+databases:
+  - name: mediwatch-db
+    plan: free
+    databaseName: mediwatch
+    user: mediwatch
+services:
+  - type: web
+    name: mediwatch
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: { name: mediwatch-db, property: connectionString }
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SEED_ADMIN_PASSWORD
+        sync: false        # Render asks you for these when you create the blueprint
+      - key: SEED_MANAGER_PASSWORD
+        sync: false
+      - key: SEED_VIEWER_PASSWORD
+        sync: false

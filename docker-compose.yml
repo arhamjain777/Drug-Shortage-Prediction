@@ -1,0 +1,37 @@
+# UNVERIFIED: written without Docker available in the build sandbox. Validate with `docker compose config`.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: mediwatch
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: mediwatch
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mediwatch"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  backend:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    environment:
+      DATABASE_URL: postgresql+psycopg://mediwatch:${POSTGRES_PASSWORD}@db:5432/mediwatch
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      OPENFDA_API_KEY: ${OPENFDA_API_KEY:-}
+      CORS_ORIGINS: http://localhost:8080
+      MODEL_DIR: /models
+    volumes: [models:/models]
+    depends_on: { db: { condition: service_healthy } }
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  frontend:
+    build: ./frontend
+    depends_on: [backend]
+    ports: ["8080:80"]
+volumes:
+  pgdata:
+  models:
