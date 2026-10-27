@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- design tokens (dark = default, futuristic; light = frosted) ---------- */
+:root {
+  --navy: 15 30 52; --teal: 13 148 136; --cyan: 14 165 233; --violet: 124 92 255;
+  --bg: 238 243 250; --surface: 255 255 255; --ink: 18 27 45; --muted: 95 110 134; --line: 214 223 236;
+  --ok: 18 140 90; --warn: 190 125 20; --crit: 200 45 35;
+  --glass: 255 255 255; --glass-a: .62; --edge: 255 255 255; --edge-a: .9; --shadow: 40 60 100;
+}
+.dark {
+  --navy: 8 14 26; --teal: 45 212 191; --cyan: 56 189 248; --violet: 139 112 255;
+  --bg: 6 10 19; --surface: 16 24 40; --ink: 234 240 250; --muted: 142 157 182; --line: 40 54 78;
+  --ok: 74 222 150; --warn: 251 191 80; --crit: 251 113 100;
+  --glass: 255 255 255; --glass-a: .06; --edge: 255 255 255; --edge-a: .14; --shadow: 0 0 0;
+}
+html { color-scheme: light; } html.dark { color-scheme: dark; }
+body { @apply bg-bg text-ink antialiased; font-family: -apple-system, "SF Pro Display", Inter, system-ui, sans-serif; letter-spacing: -0.011em; min-height: 100vh; }
+:focus-visible { outline: 2px solid rgb(var(--cyan)); outline-offset: 2px; border-radius: 12px; }
+::selection { background: rgb(var(--teal) / .35); }
+
+/* ---------- ambient aurora behind everything ---------- */
+body::before, body::after { content: ""; position: fixed; z-index: -1; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: .55; pointer-events: none; will-change: transform; }
+body::before { top: -25vmax; left: -15vmax; background: radial-gradient(circle, rgb(var(--teal) / .55), transparent 65%); animation: drift1 26s ease-in-out infinite alternate; }
+body::after { bottom: -28vmax; right: -18vmax; background: radial-gradient(circle, rgb(var(--violet) / .5), rgb(var(--cyan) / .25) 45%, transparent 68%); animation: drift2 32s ease-in-out infinite alternate; }
+html:not(.dark) body::before, html:not(.dark) body::after { opacity: .35; }
+@keyframes drift1 { to { transform: translate3d(14vmax, 10vmax, 0) scale(1.15); } }
+@keyframes drift2 { to { transform: translate3d(-12vmax, -8vmax, 0) scale(1.1); } }
+
+/* ---------- glass ---------- */
+.glass, .card {
+  background: linear-gradient(145deg, rgb(var(--glass) / var(--glass-a)), rgb(var(--glass) / calc(var(--glass-a) * .4)));
+  -webkit-backdrop-filter: blur(24px) saturate(170%); backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid rgb(var(--edge) / var(--edge-a));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .18), 0 24px 48px -24px rgb(var(--shadow) / .55);
+  border-radius: 22px;
+}
+.card { padding: 1.25rem; transition: transform .22s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .25s; }
+a.card:hover, .lift:hover { transform: translateY(-3px); border-color: rgb(var(--teal) / .7); box-shadow: inset 0 1px 0 rgb(255 255 255 / .22), 0 0 0 1px rgb(var(--teal) / .25), 0 28px 60px -22px rgb(var(--teal) / .45); }
+aside[aria-label$="details"], aside[aria-label="Record details"] { background: rgb(var(--surface) / .72) !important; -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%); border-left: 1px solid rgb(var(--edge) / var(--edge-a)) !important; animation: slidein .26s cubic-bezier(.2,.8,.2,1); }
+@keyframes slidein { from { transform: translateX(32px); opacity: 0; } }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-medium rounded-full disabled:opacity-50 disabled:cursor-not-allowed; background: rgb(var(--glass) / calc(var(--glass-a) * 1.4)); border: 1px solid rgb(var(--edge) / var(--edge-a)); transition: transform .12s, background .15s, box-shadow .2s; }
+  .btn:hover:not(:disabled) { background: rgb(var(--glass) / calc(var(--glass-a) * 2.2)); transform: translateY(-1px); }
+  .btn:active:not(:disabled) { transform: scale(.97); }
+  .btn-primary { color: #04121a; border-color: transparent; font-weight: 600; background: linear-gradient(135deg, rgb(var(--teal)), rgb(var(--cyan))); box-shadow: 0 8px 24px -8px rgb(var(--teal) / .7); }
+  .btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, rgb(var(--teal)), rgb(var(--cyan))); box-shadow: 0 10px 30px -6px rgb(var(--cyan) / .75); }
+  .input { @apply h-10 px-4 text-sm w-full rounded-xl; background: rgb(var(--glass) / calc(var(--glass-a) * 1.2)); border: 1px solid rgb(var(--edge) / var(--edge-a)); color: rgb(var(--ink)); transition: border-color .15s, box-shadow .15s; }
+  textarea.input { @apply rounded-2xl; }
+  .input:focus { outline: none; border-color: rgb(var(--cyan)); box-shadow: 0 0 0 4px rgb(var(--cyan) / .18); }
+  .input::placeholder { color: rgb(var(--muted)); }
+  .th { @apply text-left text-[11px] font-semibold uppercase px-4 py-3; letter-spacing: .08em; color: rgb(var(--muted)); }
+  .td { @apply px-4 py-3 text-sm; border-top: 1px solid rgb(var(--edge) / calc(var(--edge-a) * .6)); }
+  tbody tr { transition: background .15s; } tbody tr:hover { background: rgb(var(--teal) / .09); }
+}
+select option { background: rgb(var(--surface)); color: rgb(var(--ink)); }
+h1 { letter-spacing: -0.03em; }
+.grad-text { background: linear-gradient(120deg, rgb(var(--ink)), rgb(var(--teal)) 60%, rgb(var(--cyan))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- live + pharmacy motifs ---------- */
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: rgb(var(--ok)); box-shadow: 0 0 0 0 rgb(var(--ok) / .7); animation: pulse 2s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 10px rgb(var(--ok) / 0); } 100% { box-shadow: 0 0 0 0 rgb(var(--ok) / 0); } }
+.ecg { stroke-dasharray: 260; stroke-dashoffset: 260; animation: ecg 3.2s linear infinite; }
+@keyframes ecg { 55% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -260; } }
+.ring { transition: stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1); }
+.rx-pattern { background-image: radial-gradient(rgb(var(--teal) / .18) 1px, transparent 1px); background-size: 18px 18px; }
+.skeleton { background: linear-gradient(90deg, rgb(var(--glass) / .08) 25%, rgb(var(--glass) / .2) 50%, rgb(var(--glass) / .08) 75%); background-size: 200% 100%; animation: sh 1.4s infinite; border-radius: 12px; }
+@keyframes sh { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
