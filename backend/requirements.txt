@@ -1,0 +1,11 @@
+# NOTE: written without internet access in the build sandbox, so these ranges are unverified.
+# If a version conflict appears, loosen the ranges and re-run the tests.
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30
+pydantic>=2.7
+SQLAlchemy>=2.0,<2.1
+psycopg[binary]>=3.1
+pandas>=2.2
+scikit-learn>=1.5
+joblib>=1.4
+httpx>=0.27
